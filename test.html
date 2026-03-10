@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test</title>
+<style>
+body{background:#111;color:#fff;font-family:sans-serif;padding:20px;font-size:14px;}
+.ok{color:#00E5A0;} .err{color:#FF2D4A;} .info{color:#FFD600;}
+p{margin:6px 0;padding:8px;background:#222;border-radius:8px;}
+</style>
+</head>
+<body>
+<h3>Firebase Test</h3>
+<div id="log"><p class="info">Loading...</p></div>
+
+<script type="module">
+const log = (msg, cls) => {
+  document.getElementById('log').innerHTML += `<p class="${cls||''}">${msg}</p>`;
+};
+
+try {
+  log('Step 1: Importing Firebase...', 'info');
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+  const { getAuth, onAuthStateChanged, signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+  const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+  log('Step 1: OK', 'ok');
+
+  log('Step 2: Initializing...', 'info');
+  const app = initializeApp({
+    apiKey: "AIzaSyCUJlksqj1--dpbP543DzMoLf8op9UVyyw",
+    authDomain: "dicerushofficials.firebaseapp.com",
+    projectId: "dicerushofficials",
+  });
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  log('Step 2: OK', 'ok');
+
+  log('Step 3: Auth state check...', 'info');
+  onAuthStateChanged(auth, (u) => {
+    log('Step 3: Auth state = ' + (u ? 'logged in' : 'not logged in'), 'ok');
+  });
+
+  log('Step 4: Anonymous sign in...', 'info');
+  const cred = await signInAnonymously(auth);
+  log('Step 4: OK - ' + cred.user.uid.slice(0,8), 'ok');
+
+  log('Step 5: Firestore read...', 'info');
+  const snap = await getDoc(doc(db, 'test', 'test'));
+  log('Step 5: Firestore OK!', 'ok');
+  log('ALL TESTS PASSED! Game should work.', 'ok');
+
+} catch(e) {
+  log('ERROR: ' + e.code + ' | ' + e.message, 'err');
+}
+</script>
+</body>
+</html>
